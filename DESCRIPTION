@@ -1,0 +1,37 @@
+Package: autorelevate
+Type: Package
+Title: The Autorelevated Family of Probability Distributions and
+    Estimation Methods
+Version: 0.1.0
+Authors@R: person("Vikas Kumar", "Sharma", email = "vksharma@bhu.ac.in",
+    role = c("aut", "cre"))
+Description: Implements the autorelevated family of probability
+    distributions, obtained by applying the autorelevation (self-relevation)
+    transform of Krakowski (1973) <doi:10.1051/ro/197307V201071> and
+    Dileepkumar and Sankaran (2022) to ten baseline lifetime distributions:
+    Weibull, Lomax, Burr XII, Gompertz, Log-Logistic, Chen, Exponentiated
+    Exponential, Power Lindley, Log-normal, and Gamma. The Weibull member of
+    the family is studied in detail by Dileep Kumar, Shabeer, and Sankaran
+    (2025) <doi:10.1080/01966324.2026.2665479>, who show that it
+    accommodates increasing, decreasing, and upside-down bathtub hazard
+    shapes. The package supplies vectorized density, distribution,
+    survival, hazard, exact quantile (via the negative branch of the
+    Lambert W function), and random-generation functions for all ten
+    baseline families, together with Maximum Likelihood, Maximum Product
+    of Spacings, Least Squares, Weighted Least Squares, and Cramer-von
+    Mises estimation, Kolmogorov-Smirnov goodness-of-fit testing,
+    Total Time on Test (TTT) plots, and cross-family model selection by
+    AIC, BIC, CAIC, and HQIC. Includes a bundled bladder cancer remission
+    dataset (Lee and Wang, 2003) for illustration.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Language: en-US
+URL: https://github.com/vksharma-bhu/autorelevate
+BugReports: https://github.com/vksharma-bhu/autorelevate/issues
+LazyData: true
+Depends: R (>= 3.5)
+Imports: stats, graphics, utils
+Suggests: testthat (>= 3.0.0), knitr, rmarkdown, spelling
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

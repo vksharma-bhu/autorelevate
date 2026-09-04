@@ -1,0 +1,32 @@
+#' Bladder Cancer Remission Times
+#'
+#' @description
+#' Remission times (in months) of 128 bladder cancer patients, a widely
+#' used benchmark lifetime dataset in the distribution-theory literature.
+#'
+#' @details
+#' This is the dataset analyzed by Dileep Kumar, Shabeer, and Sankaran
+#' (2025, Sec. 8.1), who use its \code{\link{ttt_plot}} shape to show
+#' the hazard rate is upside-down bathtub (UBT) and fit the Autorelevated
+#' Weibull distribution to it, outperforming the plain Weibull,
+#' exponential, exponentiated exponential, and gamma distributions by
+#' AIC, BIC, CAIC, HQIC, and Kolmogorov-Smirnov goodness-of-fit. The
+#' summary statistics (n = 128, mean = 9.366, median = 6.395,
+#' variance = 110.425, min = 0.08, max = 79.05) match Table 7 of that
+#' paper exactly.
+#'
+#' @format A numeric vector of length 128 (remission times in months).
+#' @source Lee, E. T., & Wang, J. W. (2003). \emph{Statistical Methods
+#'   for Survival Data Analysis} (3rd ed.). Wiley.
+#' @references
+#' Dileep Kumar, M., Shabeer, A. M., & Sankaran, P. G. (2025). Reliability
+#' properties and applications of autorelevated Weibull distribution.
+#' \emph{American Journal of Mathematical and Management Sciences}, 44(3-4),
+#' 215-237. \doi{10.1080/01966324.2026.2665479}
+#' @examples
+#' data(bladder_cancer)
+#' summary(bladder_cancer)
+#' ttt_plot(bladder_cancer)
+#' compare_families(bladder_cancer)
+"bladder_cancer"
+

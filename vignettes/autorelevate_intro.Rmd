@@ -1,0 +1,133 @@
+---
+title: "Getting Started with autorelevate"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with autorelevate}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(autorelevate)
+```
+
+## Introduction
+
+The autorelevate package implements the **autorelevated family** of
+probability distributions, obtained by applying the autorelevation
+(self-relevation) transform of Krakowski (1973) and Dileepkumar and
+Sankaran (2022) to a baseline lifetime distribution. Ten baseline
+families are supported: Weibull, Lomax, Burr XII, Gompertz,
+Log-Logistic, Chen, Exponentiated Exponential, Power Lindley,
+Log-normal, and Gamma. See `?autorelevate-package` for the transform's
+derivation and `citation("autorelevate")` for full references.
+
+## A Real Dataset
+
+The package bundles `bladder_cancer`, the remission times (in months)
+of 128 bladder cancer patients (Lee & Wang, 2003), the same dataset
+analyzed by Dileep Kumar, Shabeer, and Sankaran (2025, Sec. 8.1).
+
+```{r data}
+data(bladder_cancer)
+summary(bladder_cancer)
+```
+
+### Step 1: Diagnose the hazard shape with a TTT plot
+
+Before fitting anything, a Total Time on Test (TTT) plot (Aarset, 1987)
+shows whether the hazard rate is likely increasing, decreasing, bathtub,
+or upside-down bathtub (UBT), purely from the shape of the empirical
+curve relative to the 45-degree line.
+
+```{r ttt}
+ttt_plot(bladder_cancer)
+```
+
+The curve is concave then convex, indicating a UBT-shaped hazard --
+exactly the shape the Autorelevated Weibull was designed to capture
+(see `?haautorelevate` for the theorem governing when the ARW hazard is
+increasing, decreasing, or UBT).
+
+### Step 2: Compare all ten baseline families
+
+```{r compare_families}
+family_table <- compare_families(bladder_cancer)
+print(family_table)
+```
+
+Families are ranked by AIC; `BIC`, `CAIC`, and `HQIC` are reported
+alongside for cross-checking, since they penalize model complexity
+differently (though here all ten families share the same two
+parameters, so the ranking is driven purely by fit).
+
+### Step 3: Fit and diagnose the best family
+
+```{r fit, warning=FALSE, message=FALSE, fig.width=8, fig.height=4}
+best_dist <- family_table$Family[1]
+fit_best <- fit_autorelevate(bladder_cancer, dist = best_dist, method = "mle")
+summary(fit_best)
+plot(fit_best)
+```
+
+## Comparing Estimation Methods
+
+Beyond comparing baseline families, you can compare MLE against Maximum
+Product of Spacings (MPS), Least Squares (LS), Weighted Least Squares
+(WLS), and Cramer-von Mises (CvM) for a single family:
+
+```{r fit_all_methods}
+fit_all_methods(bladder_cancer, dist = best_dist)
+```
+
+MPS is a robust alternative to MLE when the likelihood is unbounded or
+the density has a singularity; LS and WLS (Swain, Venkatraman, & Wilson,
+1988) are often preferred for small-to-moderate samples where MLE can be
+unstable.
+
+## Working With Distributions Directly
+
+All ten baseline families expose the same six functions:
+`dautorelevate()`, `pautorelevate()`, `sautorelevate()`,
+`haautorelevate()`, `qautorelevate()`, and `rautorelevate()`.
+
+```{r density}
+x <- seq(0.01, 5, by = 0.05)
+plot(x, dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5), type = "l",
+     ylab = "Density", main = "Autorelevated Weibull density")
+```
+
+```{r hazard}
+plot(x, haautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 0.8), type = "l",
+     ylab = "Hazard rate", main = "Upside-down bathtub hazard (beta = 0.8)")
+```
+
+## References
+
+Krakowski, M. (1973). The relevation transform and a generalization of
+the gamma distribution function. *Revue francaise d'automatique,
+informatique, recherche operationnelle. Recherche operationnelle*,
+7(V2), 107-120.
+
+Dileepkumar, M., & Sankaran, P. G. (2022). Some results of
+auto-relevation transform in reliability analysis. *Statistics and
+Applications*, 20(2), 251-263.
+
+Dileep Kumar, M., Shabeer, A. M., & Sankaran, P. G. (2025). Reliability
+properties and applications of autorelevated Weibull distribution.
+*American Journal of Mathematical and Management Sciences*, 44(3-4),
+215-237.
+
+Aarset, M. V. (1987). How to identify a bathtub hazard rate. *IEEE
+Transactions on Reliability*, R-36(1), 106-108.
+
+Lee, E. T., & Wang, J. W. (2003). *Statistical Methods for Survival Data
+Analysis* (3rd ed.). Wiley.
+

@@ -1,0 +1,8 @@
+^cran-comments\.md$
+^README\.Rmd$
+^\.github$
+^\.git$
+^.*\.Rproj$
+^\.Rproj\.user$
+^data-raw$
+
