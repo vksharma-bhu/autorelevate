@@ -5,14 +5,14 @@
 #' distribution specified by \code{dist}, \code{p1}, and \code{p2}.
 #'
 #' @details
-#' The autorelevation (self-relevation) transform of Krakowski (1973) and
+#' The autorelevation transform of Krakowski (1973) and
 #' Dileepkumar and Sankaran (2022), applied to a baseline density
 #' \eqn{f_0(x)} with cumulative hazard \eqn{\Lambda_0(x)}, gives the PDF
 #' \deqn{f(x) = f_0(x)\, \Lambda_0(x), \qquad x > 0.}
 #' No extra parameter is introduced relative to the baseline model.
 #'
 #' For \code{dist = "weibull"} (\eqn{\Lambda_0(x) = p1\, x^{p2}}), this
-#' reduces to the Autorelevated Weibull (ARW) density of Dileep Kumar,
+#' reduces to the Autorelevated Weibull density of Dileep Kumar,
 #' Shabeer, and Sankaran (2025, Eq. 2.3),
 #' \deqn{f(x) = p2\, p1^2\, x^{2\,p2 - 1}\, e^{-p1\, x^{p2}},}
 #' with \code{p1} playing the role of the Weibull rate \eqn{\lambda} and
@@ -23,15 +23,15 @@
 #' distributional check for \code{dist = "weibull"}.
 #'
 #' See \link{autorelevate-package} for the cumulative hazard of all ten
-#' supported baseline families.
+#' supported baseline distributions.
 #'
 #' @param x Vector of quantiles.
-#' @param dist Baseline distribution family: \code{"weibull"},
+#' @param dist Baseline distribution: \code{"weibull"},
 #'   \code{"lomax"}, \code{"burr"}, \code{"gompertz"},
 #'   \code{"loglogistic"}, \code{"chen"}, \code{"expexp"},
 #'   \code{"powerlindley"}, \code{"lognormal"}, or \code{"gamma"}. See
 #'   \link{autorelevate-package} for the role of \code{p1} and \code{p2}
-#'   within each family.
+#'   within each distribution.
 #' @param p1 Baseline parameter 1 (interpretation depends on \code{dist}).
 #' @param p2 Baseline parameter 2 (interpretation depends on \code{dist}).
 #' @param log Logical; if TRUE, densities are returned as log(f).
@@ -54,14 +54,14 @@
 #' @examples
 #' x <- seq(0.1, 5, by = 0.1)
 #'
-#' # Weibull baseline (Autorelevated Weibull, ARW)
+#' # Weibull baseline (Autorelevated Weibull)
 #' fx <- dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5)
 #' plot(x, fx, type = "l", ylab = "Density", main = "Autorelevated Weibull")
 #'
 #' # Log-density, useful for likelihood-based estimation
 #' dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5, log = TRUE)
 #'
-#' # The five newer baseline families
+#' # The five newer baseline distributions
 #' dautorelevate(x, dist = "chen", p1 = 0.3, p2 = 1.4)
 #' dautorelevate(x, dist = "expexp", p1 = 0.8, p2 = 2.3)
 #' dautorelevate(x, dist = "powerlindley", p1 = 1.2, p2 = 1.7)
@@ -75,10 +75,6 @@ dautorelevate <- function(x, dist = "weibull", p1 = 0.5, p2 = 1.5, log = FALSE) 
   if (any(ok)) {
     Lambda <- .baseline_cum_hazard(x[ok], dist, p1, p2)
     f0 <- .baseline_pdf(x[ok], dist, p1, p2)
-    # pmax(., 0) guards against floating-point cancellation noise (e.g. ~1e-32
-    # "negative" values from huge*tiny products at extreme parameter values)
-    # that can arise transiently during optimization; the density is
-    # mathematically non-negative everywhere by construction.
     pdf_val[ok] <- pmax(f0 * Lambda, 0)
   }
   pdf_val[is.na(x)] <- NA_real_
@@ -102,10 +98,10 @@ dautorelevate <- function(x, dist = "weibull", p1 = 0.5, p2 = 1.5, log = FALSE) 
 #' Equivalently, \eqn{\bar F(x) = q(\bar F_0(x))} for the concave
 #' distortion function \eqn{q(t) = t(1 - \log t)} on \eqn{[0, 1]}: the
 #' autorelevated family is, for every choice of \code{dist}, a distorted
-#' version of its own baseline family (Dileepkumar & Sankaran, 2022).
+#' version of its own baseline distribution (Dileepkumar & Sankaran, 2022).
 #'
 #' @param q Vector of quantiles.
-#' @param dist Baseline distribution family.
+#' @param dist Baseline distribution.
 #' @param p1 Baseline parameter 1.
 #' @param p2 Baseline parameter 2.
 #' @param lower.tail Logical; if TRUE (default), probabilities are P[X <= x], otherwise P[X > x].
@@ -123,7 +119,7 @@ dautorelevate <- function(x, dist = "weibull", p1 = 0.5, p2 = 1.5, log = FALSE) 
 #' # Upper tail P[X > x]
 #' pautorelevate(q, dist = "weibull", p1 = 0.5, p2 = 1.5, lower.tail = FALSE)
 #'
-#' # CDF + survival function sum to 1, for every baseline family
+#' # CDF + survival function sum to 1, for every baseline distribution
 #' cdf <- pautorelevate(q, dist = "gamma", p1 = 1.1, p2 = 2.4)
 #' surv <- sautorelevate(q, dist = "gamma", p1 = 1.1, p2 = 2.4)
 #' all.equal(cdf + surv, rep(1, length(q)))
@@ -157,12 +153,12 @@ pautorelevate <- function(q, dist = "weibull", p1 = 0.5, p2 = 1.5,
 #' reduces to the autorelevation survival function
 #' \deqn{\bar F(x) = \bar F_0(x)\left(1 - \log \bar F_0(x)\right)
 #'   = e^{-\Lambda_0(x)}\left(1 + \Lambda_0(x)\right).}
-#' For \code{dist = "weibull"} this is the ARW survival function of
+#' For \code{dist = "weibull"} this is the Autorelevated Weibull survival function of
 #' Dileep Kumar, Shabeer, and Sankaran (2025, Eq. 2.2),
 #' \eqn{\bar F(x) = e^{-p1\,x^{p2}}\left(1 + p1\,x^{p2}\right)}.
 #'
 #' @param x Vector of quantiles.
-#' @param dist Baseline distribution family.
+#' @param dist Baseline distribution.
 #' @param p1 Baseline parameter 1.
 #' @param p2 Baseline parameter 2.
 #' @param log Logical; if TRUE, survival values are returned as log(S).
@@ -221,7 +217,7 @@ sautorelevate <- function(x, dist = "weibull", p1 = 0.5, p2 = 1.5, log = FALSE) 
 #' the IHR case, not UBT), and decreasing (DHR) for \eqn{0 < \beta \le 1/2}.
 #'
 #' @param x Vector of quantiles.
-#' @param dist Baseline distribution family.
+#' @param dist Baseline distribution.
 #' @param p1 Baseline parameter 1.
 #' @param p2 Baseline parameter 2.
 #' @return Numeric vector of hazard rate values.
@@ -277,7 +273,7 @@ haautorelevate <- function(x, dist = "weibull", p1 = 0.5, p2 = 1.5) {
 #' baseline.
 #'
 #' @param p Vector of probabilities.
-#' @param dist Baseline distribution family.
+#' @param dist Baseline distribution.
 #' @param p1 Baseline parameter 1.
 #' @param p2 Baseline parameter 2.
 #' @param lower.tail Logical; if TRUE (default), probabilities are P[X <= x].
@@ -296,7 +292,7 @@ haautorelevate <- function(x, dist = "weibull", p1 = 0.5, p2 = 1.5) {
 #' p <- c(0.1, 0.25, 0.5, 0.75, 0.9)
 #' qautorelevate(p, dist = "weibull", p1 = 0.5, p2 = 1.5)
 #'
-#' # Round trip: CDF then quantile recovers the original x, for every family
+#' # Round trip: CDF then quantile recovers the original x, for every distribution
 #' x <- seq(0.5, 3, by = 0.5)
 #' cdf <- pautorelevate(x, dist = "powerlindley", p1 = 1.2, p2 = 1.7)
 #' qautorelevate(cdf, dist = "powerlindley", p1 = 1.2, p2 = 1.7)
@@ -339,7 +335,7 @@ qautorelevate <- function(p, dist = "weibull", p1 = 0.5, p2 = 1.5, lower.tail = 
 #' \eqn{X = Q(U)}, where \eqn{Q} is the autorelevated quantile function.
 #'
 #' @param n Number of observations.
-#' @param dist Baseline distribution family.
+#' @param dist Baseline distribution.
 #' @param p1 Baseline parameter 1.
 #' @param p2 Baseline parameter 2.
 #' @return Numeric vector of simulated random variates.
@@ -348,7 +344,7 @@ qautorelevate <- function(p, dist = "weibull", p1 = 0.5, p2 = 1.5, lower.tail = 
 #' @examples
 #' set.seed(1)
 #' x <- rautorelevate(500, dist = "weibull", p1 = 0.5, p2 = 1.5)
-#' hist(x, breaks = 30, probability = TRUE, main = "Simulated ARW sample")
+#' hist(x, breaks = 30, probability = TRUE, main = "Simulated Autorelevated Weibull sample")
 #' curve(dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5),
 #'       add = TRUE, col = "blue", lwd = 2)
 #' @export

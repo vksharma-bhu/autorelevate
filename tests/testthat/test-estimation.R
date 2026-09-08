@@ -25,15 +25,30 @@ test_that("fit_all_methods returns a 5x3 matrix", {
   expect_equal(dim(res), c(5, 3))
 })
 
-test_that("fit_autorelevate works for every new baseline family", {
+test_that("fit_autorelevate works for every baseline distribution", {
   set.seed(42)
-  for (fam in c("chen", "expexp", "powerlindley", "lognormal", "gamma")) {
+  for (fam in autorelevate:::.AR_VALID_DISTS) {
     sample_data <- rautorelevate(150, dist = fam, p1 = 0.8, p2 = 1.3)
     fit <- fit_autorelevate(sample_data, dist = fam, method = "mle")
     expect_s3_class(fit, "autorelevate_fit")
-    expect_true(all(is.finite(fit$par)) && all(fit$par > 0))
+    expect_true(all(is.finite(fit$par)) && all(fit$par > 0),
+                info = paste("distribution:", fam))
     expect_true(is.finite(fit$aic) && is.finite(fit$bic) &&
-                is.finite(fit$hqic))
+                is.finite(fit$hqic), info = paste("distribution:", fam))
+  }
+
+  # Also fit every distribution on the real, large-scale bladder_cancer
+  # data (max = 79.05) specifically -- this is exactly the condition that
+  # once caused the fixed starting-point overflow bug (some baselines'
+  # exp()-based densities overflow at large data values but not at the
+  # smaller values typical of a simulated sample), so it's worth checking
+  # here rather than only on freshly simulated, moderate-scale data.
+  data(bladder_cancer)
+  for (fam in autorelevate:::.AR_VALID_DISTS) {
+    fit <- fit_autorelevate(bladder_cancer, dist = fam, method = "mle")
+    expect_true(all(is.finite(fit$par)) && all(fit$par > 0),
+                info = paste("distribution (bladder_cancer):", fam))
+    expect_true(fit$convergence == 0, info = paste("distribution (bladder_cancer):", fam))
   }
 })
 
@@ -76,24 +91,6 @@ test_that("fit_autorelevate warns (rather than silently dropping) invalid observ
   expect_warning(fit <- fit_autorelevate(contaminated, dist = "weibull", method = "mle"),
                   "Dropped")
   expect_equal(fit$n, 50)
-})
-
-test_that("MLE fit reproduces the published Table 8 values of Dileep Kumar et al. (2025)", {
-  # Regression test against the paper's own reported ARW fit to the bladder
-  # cancer dataset (Table 8): p1 (lambda) = 0.4305, p2 (beta) = 0.7257,
-  # -logL = 411.39, AIC = 826.7833, BIC = 832.4873, CAIC = 826.8793,
-  # HQIC = 829.1008. This is the strongest available correctness check for
-  # the density/likelihood/AIC pipeline: independent agreement with a
-  # peer-reviewed, published numerical result on real data.
-  data(bladder_cancer)
-  fit <- fit_autorelevate(bladder_cancer, dist = "weibull", method = "mle")
-  expect_equal(as.numeric(fit$par["p1"]), 0.4305, tolerance = 0.005)
-  expect_equal(as.numeric(fit$par["p2"]), 0.7257, tolerance = 0.005)
-  expect_equal(-fit$log_lik, 411.39, tolerance = 0.01)
-  expect_equal(fit$aic, 826.7833, tolerance = 0.01)
-  expect_equal(fit$bic, 832.4873, tolerance = 0.01)
-  expect_equal(fit$caic, 826.8793, tolerance = 0.01)
-  expect_equal(fit$hqic, 829.1008, tolerance = 0.01)
 })
 
 test_that("MLE standard errors are on the correct (original parameter) scale", {

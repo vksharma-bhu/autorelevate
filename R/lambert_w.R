@@ -25,6 +25,11 @@
 #'   Newton iteration:
 #'   \deqn{w_{n+1} = w_n - \frac{f(w_n)}{f'(w_n) - \dfrac{f(w_n) f''(w_n)}{2 f'(w_n)}}.}
 #' }
+#' \strong{Convergence.} Near either end of the domain, \eqn{f'(w) = e^w(w+1)}
+#' becomes very small, so a small residual \eqn{|f(w)|} alone does not
+#' guarantee an accurate \eqn{w}. Convergence is therefore declared when
+#' either the residual or the relative step size falls below \code{tol}.
+#'
 #' Elements outside \eqn{[-1/e, 0)} (other than \code{NA}) return
 #' \code{NaN} rather than raising an error, so a single out-of-range
 #' element does not abort a whole batch of evaluations.
@@ -60,17 +65,15 @@
     idx <- which(active)
     ew <- exp(wc[idx])
     f <- wc[idx] * ew - zc[idx]
-    converged <- abs(f) < tol
-    active[idx[converged]] <- FALSE
-    idx2 <- idx[!converged]
-    if (length(idx2) == 0) next
-    ew2 <- exp(wc[idx2])
-    f2v <- wc[idx2] * ew2 - zc[idx2]
-    f1 <- ew2 * (wc[idx2] + 1)
-    f2d <- ew2 * (wc[idx2] + 2)
-    denom <- f1 - (f2v * f2d) / (2 * f1)
+    f1 <- ew * (wc[idx] + 1)
+    f2 <- ew * (wc[idx] + 2)
+    denom <- f1 - (f * f2) / (2 * f1)
     ok <- denom != 0 & is.finite(denom)
-    wc[idx2[ok]] <- wc[idx2[ok]] - f2v[ok] / denom[ok]
+    delta <- numeric(length(idx))
+    delta[ok] <- f[ok] / denom[ok]
+    wc[idx] <- wc[idx] - delta
+    converged <- (abs(f) < tol) | (abs(delta) < tol * pmax(1, abs(wc[idx])))
+    active[idx[converged]] <- FALSE
   }
   if (any(active)) {
     warning(sprintf(

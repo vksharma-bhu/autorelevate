@@ -16,7 +16,7 @@ pautorelevate(
 \arguments{
 \item{q}{Vector of quantiles.}
 
-\item{dist}{Baseline distribution family.}
+\item{dist}{Baseline distribution.}
 
 \item{p1}{Baseline parameter 1.}
 
@@ -43,7 +43,7 @@ function of the autorelevation transform is
 Equivalently, \eqn{\bar F(x) = q(\bar F_0(x))} for the concave
 distortion function \eqn{q(t) = t(1 - \log t)} on \eqn{[0, 1]}: the
 autorelevated family is, for every choice of \code{dist}, a distorted
-version of its own baseline family (Dileepkumar & Sankaran, 2022).
+version of its own baseline distribution (Dileepkumar & Sankaran, 2022).
 }
 \examples{
 q <- seq(0.1, 5, by = 0.5)
@@ -52,7 +52,7 @@ pautorelevate(q, dist = "weibull", p1 = 0.5, p2 = 1.5)
 # Upper tail P[X > x]
 pautorelevate(q, dist = "weibull", p1 = 0.5, p2 = 1.5, lower.tail = FALSE)
 
-# CDF + survival function sum to 1, for every baseline family
+# CDF + survival function sum to 1, for every baseline distribution
 cdf <- pautorelevate(q, dist = "gamma", p1 = 1.1, p2 = 2.4)
 surv <- sautorelevate(q, dist = "gamma", p1 = 1.1, p2 = 2.4)
 all.equal(cdf + surv, rep(1, length(q)))

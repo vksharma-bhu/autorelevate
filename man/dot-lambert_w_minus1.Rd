@@ -42,6 +42,11 @@ proceeds in two steps:
   Newton iteration:
   \deqn{w_{n+1} = w_n - \frac{f(w_n)}{f'(w_n) - \dfrac{f(w_n) f''(w_n)}{2 f'(w_n)}}.}
 }
+\strong{Convergence.} Near either end of the domain, \eqn{f'(w) = e^w(w+1)}
+becomes very small, so a small residual \eqn{|f(w)|} alone does not
+guarantee an accurate \eqn{w}. Convergence is therefore declared when
+either the residual or the relative step size falls below \code{tol}.
+
 Elements outside \eqn{[-1/e, 0)} (other than \code{NA}) return
 \code{NaN} rather than raising an error, so a single out-of-range
 element does not abort a whole batch of evaluations.

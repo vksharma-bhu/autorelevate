@@ -9,7 +9,7 @@ haautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5)
 \arguments{
 \item{x}{Vector of quantiles.}
 
-\item{dist}{Baseline distribution family.}
+\item{dist}{Baseline distribution.}
 
 \item{p1}{Baseline parameter 1.}
 

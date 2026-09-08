@@ -14,11 +14,11 @@ for AIC/BIC/CAIC/HQIC; see \code{\link{fit_autorelevate}}).}
 }
 \value{
 An object of class \code{autorelevate_compare}: a data frame
-  with one row per baseline family, ranked by ascending AIC.
+  with one row per baseline distribution, ranked by ascending AIC.
 }
 \description{
 Fits a dataset across all ten supported baseline distribution
-families using Maximum Likelihood Estimation (MLE) and returns a
+distributions using Maximum Likelihood Estimation (MLE) and returns a
 ranked comparison table based on AIC, BIC, CAIC, HQIC, and
 goodness-of-fit statistics.
 }
@@ -26,7 +26,7 @@ goodness-of-fit statistics.
 Since every autorelevated family has exactly two free parameters
 regardless of \code{dist} (the transform adds none), differences in
 AIC/BIC/CAIC/HQIC across rows of the returned table reflect purely
-the baseline family's shape flexibility for the data at hand, with no
+the baseline distribution's shape flexibility for the data at hand, with no
 penalty-term confound from differing parameter counts. Ranking by AIC
 follows the model-selection approach used for the Autorelevated
 Weibull member by Dileep Kumar, Shabeer, and Sankaran (2025).

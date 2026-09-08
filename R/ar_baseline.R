@@ -2,16 +2,16 @@
 #'
 #' @description
 #' Internal helpers giving the cumulative hazard \eqn{\Lambda_0(x)}, its
-#' inverse, and the density \eqn{f_0(x)} of the ten baseline families
+#' inverse, and the density \eqn{f_0(x)} of the ten baseline distributions
 #' supported by this package. See \link{autorelevate-package} for the
-#' definition of each family in terms of \code{p1} and \code{p2}.
+#' definition of each distribution in terms of \code{p1} and \code{p2}.
 #'
 #' @details
 #' Every autorelevated quantity in this package (\code{\link{dautorelevate}},
 #' \code{\link{pautorelevate}}, \code{\link{sautorelevate}},
 #' \code{\link{haautorelevate}}, \code{\link{qautorelevate}}) is built
 #' purely from \eqn{\Lambda_0}, its inverse, and \eqn{f_0}; no other
-#' baseline-specific code is required. This keeps all ten families
+#' baseline-specific code is required. This keeps all ten distributions
 #' interchangeable and makes it straightforward to add further baselines
 #' by extending the three \code{switch} blocks below with a new
 #' cumulative hazard, inverse cumulative hazard, and density.
@@ -32,7 +32,7 @@
 #' identity that makes this possible.
 #'
 #' @param x,Lambda Numeric vectors.
-#' @param dist Baseline distribution family.
+#' @param dist Baseline distribution.
 #' @param p1 Parameter 1.
 #' @param p2 Parameter 2.
 #' @keywords internal
@@ -52,7 +52,7 @@ NULL
     powerlindley = p1 * x ^ p2 - log(1 + (p1 * x ^ p2) / (p1 + 1)),
     lognormal    = -stats::pnorm((log(x) - p1) / p2, lower.tail = FALSE, log.p = TRUE),
     gamma        = -stats::pgamma(x, shape = p2, rate = p1, lower.tail = FALSE, log.p = TRUE),
-    stop("Unsupported distribution family: ", dist)
+    stop("Unsupported distribution: ", dist)
   )
 }
 
@@ -74,7 +74,7 @@ NULL
     },
     lognormal    = exp(p1 + p2 * stats::qnorm(-Lambda, lower.tail = FALSE, log.p = TRUE)),
     gamma        = stats::qgamma(-Lambda, shape = p2, rate = p1, lower.tail = FALSE, log.p = TRUE),
-    stop("Unsupported distribution family: ", dist)
+    stop("Unsupported distribution: ", dist)
   )
 }
 
@@ -95,7 +95,7 @@ NULL
     powerlindley = (p1 ^ 2 / (p1 + 1)) * p2 * (x ^ (p2 - 1)) * (1 + x ^ p2) * exp(-p1 * x ^ p2),
     lognormal    = stats::dnorm((log(x) - p1) / p2) / (x * p2),
     gamma        = stats::dgamma(x, shape = p2, rate = p1),
-    stop("Unsupported distribution family: ", dist)
+    stop("Unsupported distribution: ", dist)
   )
 }
 

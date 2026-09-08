@@ -10,7 +10,7 @@ fit_autorelevate(data, dist = "weibull", method = "mle")
 \item{data}{Vector of positive sample observations. Missing, non-finite,
 or non-positive values are dropped with a warning before fitting.}
 
-\item{dist}{Baseline distribution family: \code{"weibull"},
+\item{dist}{Baseline distribution: \code{"weibull"},
 \code{"lomax"}, \code{"burr"}, \code{"gompertz"},
 \code{"loglogistic"}, \code{"chen"}, \code{"expexp"},
 \code{"powerlindley"}, \code{"lognormal"}, or \code{"gamma"}.}
@@ -42,10 +42,10 @@ constrained optimization. The starting point itself is chosen
 adaptively from the data via a coarse log-scale grid search (see
 \code{\link{.mle_seed_grid}}), rather than a single fixed default,
 since a fixed starting point can silently overflow or underflow for
-several families when the data's scale differs greatly from 1.
+several distributions when the data's scale differs greatly from 1.
 \itemize{
   \item \strong{MLE} maximizes the log-likelihood
-  \eqn{\sum_i \log f(x_{(i)})}, following the ARW log-likelihood
+  \eqn{\sum_i \log f(x_{(i)})}, following the Autorelevated Weibull log-likelihood
   derivation of Dileep Kumar, Shabeer, and Sankaran (2025, Sec. 6.1),
   generalized to any baseline via \code{\link{dautorelevate}}.
   Standard errors are obtained from the observed Fisher information
@@ -70,7 +70,7 @@ For MPS/LS/WLS/CvM, the optimizer is seeded at the MLE solution.
 \strong{Model-selection criteria} (\code{method = "mle"} only, since
 all four require the maximized log-likelihood \eqn{\hat\ell} and are
 only asymptotically justified through it), with \eqn{k = 2}
-parameters for every family in this package:
+parameters for every distribution in this package:
 \deqn{\mathrm{AIC} = 2k - 2\hat\ell, \quad
       \mathrm{BIC} = k \log n - 2\hat\ell, \quad
       \mathrm{CAIC} = \frac{2kn}{n-k-1} - 2\hat\ell, \quad

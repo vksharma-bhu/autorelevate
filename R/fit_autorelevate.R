@@ -8,7 +8,7 @@
 #'
 #' @details
 #' A single fixed starting point (e.g. \code{p1 = 0.5}, \code{p2 = 1})
-#' is not safe across arbitrary data scales: for several families
+#' is not safe across arbitrary data scales: for several distributions
 #' (\code{"gompertz"}, \code{"chen"}, \code{"expexp"}) the density
 #' involves \code{exp()} of a term that grows with \code{x}, so a
 #' starting \code{p2} that is entirely reasonable for data on the order
@@ -19,11 +19,11 @@
 #' gradient anywhere nearby. This grid search guarantees the optimizer
 #' starts from a point with a finite, evaluable log-likelihood for
 #' whatever scale the data happen to be on, for every supported baseline
-#' family, at the cost of a bounded number of cheap, fully-vectorized
+#' distribution, at the cost of a bounded number of cheap, fully-vectorized
 #' density evaluations (14x14 = 196 grid points).
 #'
 #' @param data Vector of positive sample observations.
-#' @param dist Baseline distribution family.
+#' @param dist Baseline distribution.
 #' @return Numeric vector of length 2: \code{c(log(p1), log(p2))}.
 #' @keywords internal
 .mle_seed_grid <- function(data, dist) {
@@ -111,10 +111,10 @@
 #' adaptively from the data via a coarse log-scale grid search (see
 #' \code{\link{.mle_seed_grid}}), rather than a single fixed default,
 #' since a fixed starting point can silently overflow or underflow for
-#' several families when the data's scale differs greatly from 1.
+#' several distributions when the data's scale differs greatly from 1.
 #' \itemize{
 #'   \item \strong{MLE} maximizes the log-likelihood
-#'   \eqn{\sum_i \log f(x_{(i)})}, following the ARW log-likelihood
+#'   \eqn{\sum_i \log f(x_{(i)})}, following the Autorelevated Weibull log-likelihood
 #'   derivation of Dileep Kumar, Shabeer, and Sankaran (2025, Sec. 6.1),
 #'   generalized to any baseline via \code{\link{dautorelevate}}.
 #'   Standard errors are obtained from the observed Fisher information
@@ -139,7 +139,7 @@
 #' \strong{Model-selection criteria} (\code{method = "mle"} only, since
 #' all four require the maximized log-likelihood \eqn{\hat\ell} and are
 #' only asymptotically justified through it), with \eqn{k = 2}
-#' parameters for every family in this package:
+#' parameters for every distribution in this package:
 #' \deqn{\mathrm{AIC} = 2k - 2\hat\ell, \quad
 #'       \mathrm{BIC} = k \log n - 2\hat\ell, \quad
 #'       \mathrm{CAIC} = \frac{2kn}{n-k-1} - 2\hat\ell, \quad
@@ -158,7 +158,7 @@
 #'
 #' @param data Vector of positive sample observations. Missing, non-finite,
 #'   or non-positive values are dropped with a warning before fitting.
-#' @param dist Baseline distribution family: \code{"weibull"},
+#' @param dist Baseline distribution: \code{"weibull"},
 #'   \code{"lomax"}, \code{"burr"}, \code{"gompertz"},
 #'   \code{"loglogistic"}, \code{"chen"}, \code{"expexp"},
 #'   \code{"powerlindley"}, \code{"lognormal"}, or \code{"gamma"}.
@@ -269,16 +269,8 @@ fit_autorelevate <- function(data, dist = "weibull", method = "mle") {
 
   if (method == "mle") {
     opt <- mle_seed
-    par_hat <- exp(opt$par)  # p1, p2 on the original (untransformed) scale
+    par_hat <- exp(opt$par)
     vcov_mat <- tryCatch({
-      # optimHess() is evaluated at (log p1, log p2), since obj_func is
-      # parametrized that way (to enforce positivity without constrained
-      # optimization). The resulting Hessian -- and its inverse -- are
-      # therefore for log(p1), log(p2), NOT for p1, p2 directly. We apply
-      # the delta method (Jacobian D = diag(p1, p2), since d(exp(u))/du =
-      # exp(u) = the parameter itself) to transform back to the original
-      # scale: Var(phi) ~= D %*% Var(theta) %*% D. Verified numerically
-      # against a Hessian computed directly on the original scale.
       h <- stats::optimHess(opt$par, obj_func)
       vcov_log <- solve(h)
       D <- diag(par_hat, nrow = 2)
@@ -335,7 +327,7 @@ fit_autorelevate <- function(data, dist = "weibull", method = "mle") {
 #' other methods.
 #'
 #' @param data Vector of positive sample observations.
-#' @param dist Baseline distribution family.
+#' @param dist Baseline distribution.
 #' @return A matrix comparing parameter estimates and KS statistics
 #'   across methods (rows: \code{MLE}, \code{MPS}, \code{LS}, \code{WLS},
 #'   \code{CVM}; columns: \code{Estimate_p1}, \code{Estimate_p2},
@@ -368,7 +360,7 @@ fit_all_methods <- function(data, dist = "weibull") {
 #'
 #' @description
 #' Fits a dataset across all ten supported baseline distribution
-#' families using Maximum Likelihood Estimation (MLE) and returns a
+#' distributions using Maximum Likelihood Estimation (MLE) and returns a
 #' ranked comparison table based on AIC, BIC, CAIC, HQIC, and
 #' goodness-of-fit statistics.
 #'
@@ -376,7 +368,7 @@ fit_all_methods <- function(data, dist = "weibull") {
 #' Since every autorelevated family has exactly two free parameters
 #' regardless of \code{dist} (the transform adds none), differences in
 #' AIC/BIC/CAIC/HQIC across rows of the returned table reflect purely
-#' the baseline family's shape flexibility for the data at hand, with no
+#' the baseline distribution's shape flexibility for the data at hand, with no
 #' penalty-term confound from differing parameter counts. Ranking by AIC
 #' follows the model-selection approach used for the Autorelevated
 #' Weibull member by Dileep Kumar, Shabeer, and Sankaran (2025).
@@ -385,7 +377,7 @@ fit_all_methods <- function(data, dist = "weibull") {
 #' @param method Estimation method, defaults to \code{"mle"} (required
 #'   for AIC/BIC/CAIC/HQIC; see \code{\link{fit_autorelevate}}).
 #' @return An object of class \code{autorelevate_compare}: a data frame
-#'   with one row per baseline family, ranked by ascending AIC.
+#'   with one row per baseline distribution, ranked by ascending AIC.
 #' @references
 #' Dileep Kumar, M., Shabeer, A. M., & Sankaran, P. G. (2025). Reliability
 #' properties and applications of autorelevated Weibull distribution.

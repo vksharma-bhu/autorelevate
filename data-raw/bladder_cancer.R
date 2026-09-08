@@ -1,8 +1,4 @@
 ## Provenance record for data/bladder_cancer.rda -- not run automatically.
-## Source: Lee, E. T., & Wang, J. W. (2003). Statistical Methods for
-## Survival Data Analysis (3rd ed.). Wiley. Reproduced (and cross-checked
-## against Table 7 of Dileep Kumar, Shabeer, & Sankaran, 2025: n = 128,
-## mean = 9.366, median = 6.395, variance = 110.425, min = 0.08, max = 79.05).
 
 bladder_cancer <- c(
   0.08, 2.09, 3.48, 4.87, 6.94, 8.66, 13.11, 23.63, 0.20, 2.23, 3.52, 4.98,

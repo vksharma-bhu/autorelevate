@@ -9,7 +9,7 @@ fit_all_methods(data, dist = "weibull")
 \arguments{
 \item{data}{Vector of positive sample observations.}
 
-\item{dist}{Baseline distribution family.}
+\item{dist}{Baseline distribution.}
 }
 \value{
 A matrix comparing parameter estimates and KS statistics

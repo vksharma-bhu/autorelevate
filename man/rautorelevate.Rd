@@ -9,7 +9,7 @@ rautorelevate(n, dist = "weibull", p1 = 0.5, p2 = 1.5)
 \arguments{
 \item{n}{Number of observations.}
 
-\item{dist}{Baseline distribution family.}
+\item{dist}{Baseline distribution.}
 
 \item{p1}{Baseline parameter 1.}
 
@@ -32,7 +32,7 @@ draw \eqn{U \sim \mathrm{Unif}(0,1)} per variate is transformed via
 \examples{
 set.seed(1)
 x <- rautorelevate(500, dist = "weibull", p1 = 0.5, p2 = 1.5)
-hist(x, breaks = 30, probability = TRUE, main = "Simulated ARW sample")
+hist(x, breaks = 30, probability = TRUE, main = "Simulated Autorelevated Weibull sample")
 curve(dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5),
       add = TRUE, col = "blue", lwd = 2)
 }

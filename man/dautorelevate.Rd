@@ -9,12 +9,12 @@ dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5, log = FALSE)
 \arguments{
 \item{x}{Vector of quantiles.}
 
-\item{dist}{Baseline distribution family: \code{"weibull"},
+\item{dist}{Baseline distribution: \code{"weibull"},
 \code{"lomax"}, \code{"burr"}, \code{"gompertz"},
 \code{"loglogistic"}, \code{"chen"}, \code{"expexp"},
 \code{"powerlindley"}, \code{"lognormal"}, or \code{"gamma"}. See
 \link{autorelevate-package} for the role of \code{p1} and \code{p2}
-within each family.}
+within each distribution.}
 
 \item{p1}{Baseline parameter 1 (interpretation depends on \code{dist}).}
 
@@ -30,14 +30,14 @@ Density function of the autorelevated family built from a baseline
 distribution specified by \code{dist}, \code{p1}, and \code{p2}.
 }
 \details{
-The autorelevation (self-relevation) transform of Krakowski (1973) and
+The autorelevation transform of Krakowski (1973) and
 Dileepkumar and Sankaran (2022), applied to a baseline density
 \eqn{f_0(x)} with cumulative hazard \eqn{\Lambda_0(x)}, gives the PDF
 \deqn{f(x) = f_0(x)\, \Lambda_0(x), \qquad x > 0.}
 No extra parameter is introduced relative to the baseline model.
 
 For \code{dist = "weibull"} (\eqn{\Lambda_0(x) = p1\, x^{p2}}), this
-reduces to the Autorelevated Weibull (ARW) density of Dileep Kumar,
+reduces to the Autorelevated Weibull density of Dileep Kumar,
 Shabeer, and Sankaran (2025, Eq. 2.3),
 \deqn{f(x) = p2\, p1^2\, x^{2\,p2 - 1}\, e^{-p1\, x^{p2}},}
 with \code{p1} playing the role of the Weibull rate \eqn{\lambda} and
@@ -48,19 +48,19 @@ distribution with shape 2 and scale \code{1 / p1}; this gives an exact
 distributional check for \code{dist = "weibull"}.
 
 See \link{autorelevate-package} for the cumulative hazard of all ten
-supported baseline families.
+supported baseline distributions.
 }
 \examples{
 x <- seq(0.1, 5, by = 0.1)
 
-# Weibull baseline (Autorelevated Weibull, ARW)
+# Weibull baseline (Autorelevated Weibull)
 fx <- dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5)
 plot(x, fx, type = "l", ylab = "Density", main = "Autorelevated Weibull")
 
 # Log-density, useful for likelihood-based estimation
 dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5, log = TRUE)
 
-# The five newer baseline families
+# The five newer baseline distributions
 dautorelevate(x, dist = "chen", p1 = 0.3, p2 = 1.4)
 dautorelevate(x, dist = "expexp", p1 = 0.8, p2 = 2.3)
 dautorelevate(x, dist = "powerlindley", p1 = 1.2, p2 = 1.7)

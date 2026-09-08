@@ -10,10 +10,7 @@
 #' the hazard rate is upside-down bathtub (UBT) and fit the Autorelevated
 #' Weibull distribution to it, outperforming the plain Weibull,
 #' exponential, exponentiated exponential, and gamma distributions by
-#' AIC, BIC, CAIC, HQIC, and Kolmogorov-Smirnov goodness-of-fit. The
-#' summary statistics (n = 128, mean = 9.366, median = 6.395,
-#' variance = 110.425, min = 0.08, max = 79.05) match Table 7 of that
-#' paper exactly.
+#' AIC, BIC, CAIC, HQIC, and Kolmogorov-Smirnov goodness-of-fit.
 #'
 #' @format A numeric vector of length 128 (remission times in months).
 #' @source Lee, E. T., & Wang, J. W. (2003). \emph{Statistical Methods

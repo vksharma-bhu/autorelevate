@@ -9,7 +9,7 @@ qautorelevate(p, dist = "weibull", p1 = 0.5, p2 = 1.5, lower.tail = TRUE)
 \arguments{
 \item{p}{Vector of probabilities.}
 
-\item{dist}{Baseline distribution family.}
+\item{dist}{Baseline distribution.}
 
 \item{p1}{Baseline parameter 1.}
 
@@ -48,7 +48,7 @@ baseline.
 p <- c(0.1, 0.25, 0.5, 0.75, 0.9)
 qautorelevate(p, dist = "weibull", p1 = 0.5, p2 = 1.5)
 
-# Round trip: CDF then quantile recovers the original x, for every family
+# Round trip: CDF then quantile recovers the original x, for every distribution
 x <- seq(0.5, 3, by = 0.5)
 cdf <- pautorelevate(x, dist = "powerlindley", p1 = 1.2, p2 = 1.7)
 qautorelevate(cdf, dist = "powerlindley", p1 = 1.2, p2 = 1.7)

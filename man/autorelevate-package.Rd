@@ -7,16 +7,28 @@
 \title{autorelevate: The Autorelevated Family of Probability Distributions and Estimation Methods}
 \description{
 Implements the \strong{autorelevated family} of probability
-distributions and estimation routines for it.
+distributions -- obtained by applying the autorelevation
+transform of Krakowski (1973) to a baseline
+lifetime distribution -- across ten baseline distributions (Weibull,
+Lomax, Burr XII, Gompertz, Log-Logistic, Chen, Exponentiated
+Exponential, Power Lindley, Log-normal, and Gamma). Provides
+vectorized density, distribution, survival, hazard, exact quantile,
+and random-generation functions for each distribution, together with five
+estimation methods (Maximum Likelihood, Maximum Product of Spacings,
+Least Squares, Weighted Least Squares, and Cramer-von Mises),
+goodness-of-fit testing, a Total Time on Test diagnostic plot, and
+cross-family model selection by AIC, BIC, CAIC, and HQIC. See
+Details below for the mathematical derivation of the transform and
+the exact role of \code{p1}/\code{p2} within each baseline distribution.
 }
 \details{
-\strong{The relevation and autorelevation transforms.} Let \eqn{X} and
+\strong{The relevation and autorelevation transformations.} Let \eqn{X} and
 \eqn{Y} be non-negative random variables with survival functions
-\eqn{\bar F_1} and \eqn{\bar F_2}. The \emph{relevation transform}
+\eqn{\bar F_1} and \eqn{\bar F_2}, respectively. The \emph{relevation transform}
 \eqn{\Psi(X)} of Krakowski (1973) is the survival function of the total
 lifetime of a system in which an item from population 1 is replaced, at
 the moment of its failure at age \eqn{x}, by an item of the same age
-\eqn{x} from population 2:
+\eqn{x} from population 2. The survival function is
 \deqn{\bar F(x) = \bar F_1(x) - \int_0^x \frac{\bar F_2(t)}{\bar F_1(t)} \, dF_1(t).}
 When \eqn{X} and \eqn{Y} are identically distributed with common
 baseline survival function \eqn{\bar F_0}, the resulting variable is
@@ -30,11 +42,24 @@ cumulative hazard as \eqn{\Lambda_0(x) = -\log \bar F_0(x)}, this becomes
       f(x) = f_0(x)\,\Lambda_0(x),}
 which is the parametrization used throughout this package
 (\code{\link{sautorelevate}}, \code{\link{dautorelevate}}). Because the
-transform adds no extra parameter to the baseline model, every
+transformation adds no extra parameter to the baseline model, every
 autorelevated member inherits the baseline's parameters \code{p1},
 \code{p2} with no increase in dimensionality.
 
-\strong{Baseline families.} Ten baseline lifetime distributions are
+\strong{Domain.} Throughout this package, and in every formula in this
+documentation, \eqn{x > 0} (support of the autorelevated family), and
+both baseline parameters \eqn{p1 > 0} and \eqn{p2 > 0} -- reflecting
+that every one of the ten baseline distributions is itself a lifetime
+distribution with positive support and positive parameters. Values
+of \code{x}, \code{p1}, or \code{p2} outside this range are not part
+of the model; see \code{\link{.validate_ar_inputs}} for how invalid
+\code{p1}/\code{p2} are rejected with an explicit error, and the
+\code{d}/\code{p}/\code{s}/\code{ha} functions' own documentation for
+how out-of-range \code{x} is handled (mapped to the natural boundary
+value of \eqn{0}, \eqn{1}, or the density/hazard being \eqn{0}, as
+appropriate, rather than raising an error).
+
+\strong{Baseline distributions.} Ten baseline probability distributions are
 supported via the \code{dist} argument, each with its own
 interpretation of \code{p1} and \code{p2} (both must be single
 positive, finite scalars -- vectorizing over parameter values, the
@@ -43,18 +68,19 @@ supported; only the first argument, e.g. \code{x} or \code{q}, is
 vectorized):
 \itemize{
   \item \code{"weibull"}: \eqn{\Lambda_0(x) = p1\, x^{p2}}. This is the
-    Autorelevated Weibull (ARW) distribution of Dileep Kumar, Shabeer,
+    Autorelevated Weibull distribution of Dileep Kumar, Shabeer,
     and Sankaran (2025).
-  \item \code{"lomax"}: \eqn{\Lambda_0(x) = p2 \log(1 + p1\, x)}.
+  \item \code{"lomax"}: \eqn{\Lambda_0(x) = p2 \log(1 + p1\, x)}. The
+    autorelevated Lomax distribution is studied by Sharma, Pal,
+    Bhardwaj, and Tyagi (2026, submitted), who establish its
+    upside-down bathtub hazard shape with applications to cancer
+    survival data.
   \item \code{"burr"} (Burr XII): \eqn{\Lambda_0(x) = p2 \log(1 + x^{p1})}.
-  \item \code{"gompertz"}: \eqn{\Lambda_0(x) = p1\left(e^{p2 x} - 1\right)}
-    (\code{p1}, \code{p2} correspond to \eqn{\eta}, \eqn{b} in the usual
-    Wikipedia/actuarial parametrization; the baseline hazard is
-    \eqn{h_0(x) = p1\,p2\,e^{p2 x}}).
+  \item \code{"gompertz"}: \eqn{\Lambda_0(x) = p1\left(e^{p2 x} - 1\right)}.
   \item \code{"loglogistic"}: \eqn{\Lambda_0(x) = \log\!\left(1 + (x/p1)^{p2}\right)}.
   \item \code{"chen"}: \eqn{\Lambda_0(x) = p1\left(e^{x^{p2}} - 1\right)}
     (Chen, 2000).
-  \item \code{"expexp"} (Exponentiated/Generalized Exponential):
+  \item \code{"expexp"} (Exponentiated Exponential):
     \eqn{\Lambda_0(x) = -\log\!\left(1 - (1 - e^{-p1 x})^{p2}\right)}
     (Gupta & Kundu, 1999).
   \item \code{"powerlindley"}: \eqn{\Lambda_0(x) = p1\,x^{p2} -
@@ -70,12 +96,12 @@ vectorized):
 }
 
 \strong{Estimation.} \code{\link{fit_autorelevate}} fits any of the ten
-families by Maximum Likelihood (MLE), Maximum Product of Spacings
+members by Maximum Likelihood (MLE), Maximum Product of Spacings
 (MPS), Least Squares (LS), Weighted Least Squares (WLS), or
 Cramer-von Mises (CvM) minimum-distance estimation, and reports AIC,
 BIC, CAIC, and HQIC for \code{method = "mle"}.
 \code{\link{fit_all_methods}} and \code{\link{compare_families}}
-compare methods and baseline families, respectively.
+compare methods and baseline distributions, respectively.
 \code{\link{ttt_plot}} produces a Total Time on Test plot, a
 pre-fitting diagnostic for hazard shape (Aarset, 1987).
 
@@ -96,6 +122,10 @@ Dileep Kumar, M., Shabeer, A. M., & Sankaran, P. G. (2025). Reliability
 properties and applications of autorelevated Weibull distribution.
 \emph{American Journal of Mathematical and Management Sciences}, 44(3-4),
 215-237. \doi{10.1080/01966324.2026.2665479}
+
+Sharma, V. K., Pal, S., Bhardwaj, H., & Tyagi, V. (2026). The
+autorelevated Lomax distribution: An upside-down bathtub hazard model
+with properties and applications to cancer survival data. Submitted.
 
 Chen, Z. (2000). A new two-parameter lifetime distribution with
 bathtub shape or increasing failure rate function. \emph{Statistics &

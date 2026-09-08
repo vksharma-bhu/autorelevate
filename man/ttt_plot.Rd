@@ -34,11 +34,7 @@ Plotting \eqn{G(r/n)} against \eqn{r/n} and comparing to the 45-degree
 line indicates the hazard shape: concave indicates an increasing
 hazard (IHR), convex indicates a decreasing hazard (DHR), convex then
 concave indicates a bathtub hazard, and concave then convex indicates
-an upside-down bathtub (UBT) hazard (Aarset, 1987). This is exactly
-the diagnostic used by Dileep Kumar, Shabeer, and Sankaran (2025,
-Sec. 8.1) to establish that the bundled \code{\link{bladder_cancer}}
-dataset has UBT-shaped hazard, motivating the Autorelevated Weibull
-fit in that section.
+an upside-down bathtub (UBT) hazard (Aarset, 1987).
 }
 \examples{
 data(bladder_cancer)

@@ -1,7 +1,7 @@
 #' Supported Baseline Distribution Families
 #'
 #' @description
-#' The ten baseline family names accepted by the \code{dist} argument
+#' The ten baseline distribution names accepted by the \code{dist} argument
 #' throughout this package.
 #' @keywords internal
 .AR_VALID_DISTS <- c("weibull", "lomax", "burr", "gompertz", "loglogistic",
@@ -22,7 +22,7 @@
 #' cryptic numerical failure inside \code{\link[stats]{optim}} or the
 #' Lambert W solver.
 #'
-#' @param dist Baseline distribution family.
+#' @param dist Baseline distribution.
 #' @param p1 Baseline parameter 1.
 #' @param p2 Baseline parameter 2.
 #' @param data Optional numeric vector to validate as well.

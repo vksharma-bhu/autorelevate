@@ -7,7 +7,7 @@
 .validate_ar_inputs(dist, p1, p2, data = NULL)
 }
 \arguments{
-\item{dist}{Baseline distribution family.}
+\item{dist}{Baseline distribution.}
 
 \item{p1}{Baseline parameter 1.}
 

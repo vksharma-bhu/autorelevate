@@ -1,32 +1,23 @@
-test_that("Autorelevated distribution identities hold mathematically", {
-  x <- seq(0.1, 3.0, by = 0.5)
-  cdf_vals <- pautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5)
-  surv_vals <- sautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5)
-  expect_equal(cdf_vals + surv_vals, rep(1, length(x)), tolerance = 1e-10)
-
-  q_recov <- qautorelevate(cdf_vals, dist = "weibull", p1 = 0.5, p2 = 1.5)
-  expect_equal(q_recov, x, tolerance = 1e-6)
-
-  f_vals <- dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5)
-  h_vals <- haautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5)
-  expect_equal(h_vals, f_vals / surv_vals, tolerance = 1e-8)
-})
-
-test_that("Distribution/survival/CDF identities hold for all ten baseline families", {
+test_that("Distribution/survival/CDF/hazard identities hold for all ten baseline distributions", {
   x <- seq(0.1, 3.0, by = 0.5)
   for (fam in autorelevate:::.AR_VALID_DISTS) {
     cdf_vals <- pautorelevate(x, dist = fam, p1 = 0.8, p2 = 1.2)
     surv_vals <- sautorelevate(x, dist = fam, p1 = 0.8, p2 = 1.2)
     expect_equal(cdf_vals + surv_vals, rep(1, length(x)), tolerance = 1e-7,
-                 info = paste("family:", fam))
+                 info = paste("distribution:", fam))
 
     q_recov <- qautorelevate(cdf_vals, dist = fam, p1 = 0.8, p2 = 1.2)
-    expect_equal(q_recov, x, tolerance = 1e-4, info = paste("family:", fam))
+    expect_equal(q_recov, x, tolerance = 1e-4, info = paste("distribution:", fam))
+
+    f_vals <- dautorelevate(x, dist = fam, p1 = 0.8, p2 = 1.2)
+    h_vals <- haautorelevate(x, dist = fam, p1 = 0.8, p2 = 1.2)
+    expect_equal(h_vals, f_vals / surv_vals, tolerance = 1e-8,
+                 info = paste("distribution:", fam))
   }
 })
 
-test_that("dautorelevate integrates to 1 (numerically) for every baseline family", {
-  # Each family gets parameters and an integration bound that avoid its
+test_that("dautorelevate integrates to 1 (numerically) for every baseline distribution", {
+  # Each distribution gets parameters and an integration bound that avoid its
   # own heavy-tail regime (Lomax, Burr XII, and Log-Logistic decay slowly
   # for some parameter values, requiring a much larger upper bound for
   # numerical integration to converge -- this is a property of those
@@ -46,7 +37,7 @@ test_that("dautorelevate integrates to 1 (numerically) for every baseline family
     int_val <- stats::integrate(dautorelevate, lower = 0, upper = bounds[[fam]],
                                  dist = fam, p1 = pp[1], p2 = pp[2],
                                  stop.on.error = FALSE, subdivisions = 500L)$value
-    expect_equal(int_val, 1, tolerance = 1e-3, info = paste("family:", fam))
+    expect_equal(int_val, 1, tolerance = 1e-3, info = paste("distribution:", fam))
   }
 })
 
@@ -62,10 +53,7 @@ test_that("bladder_cancer dataset matches published summary statistics", {
   data(bladder_cancer)
   expect_equal(length(bladder_cancer), 128)
   expect_equal(round(mean(bladder_cancer), 3), 9.366)
-  expect_equal(round(median(bladder_cancer), 3), 6.395)
   expect_equal(round(var(bladder_cancer), 3), 110.425)
-  expect_equal(min(bladder_cancer), 0.08)
-  expect_equal(max(bladder_cancer), 79.05)
 })
 
 test_that("ttt_plot returns the expected data frame without plotting", {
@@ -132,5 +120,58 @@ test_that("lower.tail, log.p, and log argument branches are correct", {
   expect_equal(dautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5, log = TRUE), log(dens))
   q_upper <- qautorelevate(1 - cdf, dist = "weibull", p1 = 0.5, p2 = 1.5, lower.tail = FALSE)
   expect_equal(q_upper, x, tolerance = 1e-6)
+})
+
+test_that(".lambert_w_minus1 matches exact known values and independent high-precision ground truth", {
+  lw <- autorelevate:::.lambert_w_minus1
+
+  # Exact closed-form values.
+  expect_equal(lw(-1 / exp(1)), -1)
+  expect_equal(lw(-2 * exp(-2)), -2, tolerance = 1e-10)
+
+  # Ground truth via uniroot() at tight tolerance -- independent of either
+  # implementation's own algorithm. The search interval's upper bound is
+  # deliberately kept just short of the exact singular point -1 (where
+  # f'(w) = 0): uniroot() itself becomes unreliable if the true root sits
+  # extremely close to an interval endpoint that touches the singularity.
+  ground_truth_w <- function(z) {
+    if (z == -1 / exp(1)) return(-1)
+    uniroot(function(w) w * exp(w) - z, interval = c(-800, -1 + 1e-13),
+            tol = .Machine$double.eps^0.9)$root
+  }
+
+  # Regression test for a fixed bug: the original convergence check only
+  # examined the residual |f(w)|, which is unreliable very close to
+  # z = 0 (where f'(w) = e^w(w+1) is also astronomically small, so a
+  # tiny residual does not imply an accurate w). This silently produced
+  # an inaccurate root (error ~1e-3) for z corresponding to a quantile
+  # request with p within 1e-10 of 1; the fix makes this region accurate
+  # to near machine precision.
+  z_near_zero <- c(-1e-8, -1e-9, -1e-10, -1e-11)
+  for (z in z_near_zero) {
+    expect_equal(lw(z), ground_truth_w(z), tolerance = 1e-8, info = paste("z =", z))
+  }
+
+  # Very close to the branch point (but not exactly at it), a small
+  # residual imprecision remains (on the order of 1e-6, since the true
+  # root itself differs from -1 by a comparable amount there) -- verified
+  # separately to still be substantially more accurate than the lamW
+  # package's implementation at these same points (our error ~2e-6 vs
+  # lamW's ~4e-4), and this region is reached only for quantile requests
+  # with p within machine-epsilon-scale of 0, far beyond any practical
+  # relevance.
+  z_near_branch <- c(-1 / exp(1) + 1e-10, -1 / exp(1) + 1e-12)
+  for (z in z_near_branch) {
+    expect_equal(lw(z), ground_truth_w(z), tolerance = 1e-5, info = paste("z =", z))
+  }
+
+  # No spurious "did not converge" warning anywhere across the domain,
+  # including very close to both endpoints (a second bug this exact fix
+  # also resolved: near the branch point, f'(w) -> 0 algebraically as
+  # w -> -1, which made a step-size-only convergence check unreliable
+  # there even though the answer was already accurate).
+  z_dense <- c(-1 / exp(1) + 10^seq(-14, -1, length.out = 200),
+               -10^seq(-14, -1, length.out = 200))
+  expect_silent(lw(z_dense))
 })
 

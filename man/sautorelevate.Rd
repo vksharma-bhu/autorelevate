@@ -9,7 +9,7 @@ sautorelevate(x, dist = "weibull", p1 = 0.5, p2 = 1.5, log = FALSE)
 \arguments{
 \item{x}{Vector of quantiles.}
 
-\item{dist}{Baseline distribution family.}
+\item{dist}{Baseline distribution.}
 
 \item{p1}{Baseline parameter 1.}
 
@@ -32,7 +32,7 @@ distributed populations, the relevation transform of Krakowski (1973)
 reduces to the autorelevation survival function
 \deqn{\bar F(x) = \bar F_0(x)\left(1 - \log \bar F_0(x)\right)
   = e^{-\Lambda_0(x)}\left(1 + \Lambda_0(x)\right).}
-For \code{dist = "weibull"} this is the ARW survival function of
+For \code{dist = "weibull"} this is the Autorelevated Weibull survival function of
 Dileep Kumar, Shabeer, and Sankaran (2025, Eq. 2.2),
 \eqn{\bar F(x) = e^{-p1\,x^{p2}}\left(1 + p1\,x^{p2}\right)}.
 }

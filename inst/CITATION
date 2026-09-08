@@ -1,4 +1,4 @@
-citHeader("To cite autorelevate in publications, please cite the package together with the methodological references below:")
+citHeader("To cite autorelevate in publications, use:")
 
 bibentry(
   bibtype = "Manual",
@@ -7,43 +7,5 @@ bibentry(
   year    = "2026",
   note    = "R package version 0.1.0",
   url     = "https://CRAN.R-project.org/package=autorelevate"
-)
-
-bibentry(
-  bibtype = "Article",
-  title   = "Reliability Properties and Applications of Autorelevated Weibull Distribution",
-  author  = c(person("M.", "Dileep Kumar"),
-              person("A. Mohammed", "Shabeer"),
-              person("P. G.", "Sankaran")),
-  journal = "American Journal of Mathematical and Management Sciences",
-  year    = "2025",
-  volume  = "44",
-  number  = "3-4",
-  pages   = "215--237",
-  doi     = "10.1080/01966324.2026.2665479"
-)
-
-bibentry(
-  bibtype = "Article",
-  title   = "Some Results of Auto-Relevation Transform in Reliability Analysis",
-  author  = c(person("M.", "Dileepkumar"),
-              person("P. G.", "Sankaran")),
-  journal = "Statistics and Applications",
-  year    = "2022",
-  volume  = "20",
-  number  = "2",
-  pages   = "251--263"
-)
-
-bibentry(
-  bibtype = "Article",
-  title   = "The Relevation Transform and a Generalization of the Gamma Distribution Function",
-  author  = person("M.", "Krakowski"),
-  journal = "Revue francaise d'automatique, informatique, recherche operationnelle. Recherche operationnelle",
-  year    = "1973",
-  volume  = "7",
-  number  = "V2",
-  pages   = "107--120",
-  doi     = "10.1051/ro/197307V201071"
 )
 

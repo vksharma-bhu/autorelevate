@@ -22,12 +22,13 @@ library(autorelevate)
 
 The autorelevate package implements the **autorelevated family** of
 probability distributions, obtained by applying the autorelevation
-(self-relevation) transform of Krakowski (1973) and Dileepkumar and
+transform of Krakowski (1973) and Dileepkumar and
 Sankaran (2022) to a baseline lifetime distribution. Ten baseline
-families are supported: Weibull, Lomax, Burr XII, Gompertz,
+distributions are supported: Weibull, Lomax, Burr XII, Gompertz,
 Log-Logistic, Chen, Exponentiated Exponential, Power Lindley,
 Log-normal, and Gamma. See `?autorelevate-package` for the transform's
-derivation and `citation("autorelevate")` for full references.
+derivation and full methodological references, and `citation("autorelevate")`
+to cite the package itself.
 
 ## A Real Dataset
 
@@ -53,10 +54,10 @@ ttt_plot(bladder_cancer)
 
 The curve is concave then convex, indicating a UBT-shaped hazard --
 exactly the shape the Autorelevated Weibull was designed to capture
-(see `?haautorelevate` for the theorem governing when the ARW hazard is
+(see `?haautorelevate` for the theorem governing when the Autorelevated Weibull hazard is
 increasing, decreasing, or UBT).
 
-### Step 2: Compare all ten baseline families
+### Step 2: Compare all ten baseline distributions
 
 ```{r compare_families}
 family_table <- compare_families(bladder_cancer)
@@ -65,10 +66,10 @@ print(family_table)
 
 Families are ranked by AIC; `BIC`, `CAIC`, and `HQIC` are reported
 alongside for cross-checking, since they penalize model complexity
-differently (though here all ten families share the same two
+differently (though here all ten distributions share the same two
 parameters, so the ranking is driven purely by fit).
 
-### Step 3: Fit and diagnose the best family
+### Step 3: Fit and diagnose the best distribution
 
 ```{r fit, warning=FALSE, message=FALSE, fig.width=8, fig.height=4}
 best_dist <- family_table$Family[1]
@@ -79,9 +80,9 @@ plot(fit_best)
 
 ## Comparing Estimation Methods
 
-Beyond comparing baseline families, you can compare MLE against Maximum
+Beyond comparing baseline distributions, you can compare MLE against Maximum
 Product of Spacings (MPS), Least Squares (LS), Weighted Least Squares
-(WLS), and Cramer-von Mises (CvM) for a single family:
+(WLS), and Cramer-von Mises (CvM) for a single distribution:
 
 ```{r fit_all_methods}
 fit_all_methods(bladder_cancer, dist = best_dist)
@@ -94,7 +95,7 @@ unstable.
 
 ## Working With Distributions Directly
 
-All ten baseline families expose the same six functions:
+All ten baseline distributions expose the same six functions:
 `dautorelevate()`, `pautorelevate()`, `sautorelevate()`,
 `haautorelevate()`, `qautorelevate()`, and `rautorelevate()`.
 
@@ -124,6 +125,10 @@ Dileep Kumar, M., Shabeer, A. M., & Sankaran, P. G. (2025). Reliability
 properties and applications of autorelevated Weibull distribution.
 *American Journal of Mathematical and Management Sciences*, 44(3-4),
 215-237.
+
+Sharma, V. K., Pal, S., Bhardwaj, H., & Tyagi, V. (2026). The
+autorelevated Lomax distribution: An upside-down bathtub hazard model
+with properties and applications to cancer survival data. Submitted.
 
 Aarset, M. V. (1987). How to identify a bathtub hazard rate. *IEEE
 Transactions on Reliability*, R-36(1), 106-108.

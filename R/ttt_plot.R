@@ -14,11 +14,7 @@
 #' line indicates the hazard shape: concave indicates an increasing
 #' hazard (IHR), convex indicates a decreasing hazard (DHR), convex then
 #' concave indicates a bathtub hazard, and concave then convex indicates
-#' an upside-down bathtub (UBT) hazard (Aarset, 1987). This is exactly
-#' the diagnostic used by Dileep Kumar, Shabeer, and Sankaran (2025,
-#' Sec. 8.1) to establish that the bundled \code{\link{bladder_cancer}}
-#' dataset has UBT-shaped hazard, motivating the Autorelevated Weibull
-#' fit in that section.
+#' an upside-down bathtub (UBT) hazard (Aarset, 1987).
 #'
 #' @param data Vector of positive sample observations. Missing, non-finite,
 #'   or non-positive values are dropped with a warning before computing

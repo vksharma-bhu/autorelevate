@@ -9,7 +9,7 @@
 \arguments{
 \item{data}{Vector of positive sample observations.}
 
-\item{dist}{Baseline distribution family.}
+\item{dist}{Baseline distribution.}
 }
 \value{
 Numeric vector of length 2: \code{c(log(p1), log(p2))}.
@@ -22,7 +22,7 @@ the best finite log-likelihood.
 }
 \details{
 A single fixed starting point (e.g. \code{p1 = 0.5}, \code{p2 = 1})
-is not safe across arbitrary data scales: for several families
+is not safe across arbitrary data scales: for several distributions
 (\code{"gompertz"}, \code{"chen"}, \code{"expexp"}) the density
 involves \code{exp()} of a term that grows with \code{x}, so a
 starting \code{p2} that is entirely reasonable for data on the order
@@ -33,7 +33,7 @@ optimization even begins, leaving the optimizer with no usable
 gradient anywhere nearby. This grid search guarantees the optimizer
 starts from a point with a finite, evaluable log-likelihood for
 whatever scale the data happen to be on, for every supported baseline
-family, at the cost of a bounded number of cheap, fully-vectorized
+distribution, at the cost of a bounded number of cheap, fully-vectorized
 density evaluations (14x14 = 196 grid points).
 }
 \keyword{internal}

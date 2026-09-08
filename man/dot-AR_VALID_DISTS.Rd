@@ -7,7 +7,7 @@
 .AR_VALID_DISTS
 }
 \description{
-The ten baseline family names accepted by the \code{dist} argument
+The ten baseline distribution names accepted by the \code{dist} argument
 throughout this package.
 }
 \keyword{internal}
